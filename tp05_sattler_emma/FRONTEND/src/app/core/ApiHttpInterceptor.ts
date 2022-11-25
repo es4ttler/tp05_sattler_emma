@@ -42,7 +42,8 @@ export class ApiHttpInterceptor implements HttpInterceptor {
             (error: HttpErrorResponse) => {
                 switch (error.status) {
                     case 400:
-                    case 401:this.router.navigate(["/"]);
+                    case 401:this.router.navigate(["/"]);break;
+                    case 404:this.router.navigate(["/"]);break;
                 }
                 return of(null);
             }
