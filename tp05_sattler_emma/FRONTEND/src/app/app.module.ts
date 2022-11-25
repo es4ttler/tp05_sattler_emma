@@ -19,7 +19,7 @@ import { VerifyKeypressDirective } from '../directives/verify-keyPress/verify-ke
 import {MatSnackBarModule} from '@angular/material/snack-bar';
 import { PhoneFormatPipe } from './core/pipes/phone-format.pipe';
 import {MatDialogModule} from '@angular/material/dialog';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import {MatDividerModule} from '@angular/material/divider';
 import { AppRoutingModule } from './app-routing.module';
 import { ComposantErrorRoutingComponent } from './Structure/composant-error-routing/composant-error-routing.component';
@@ -35,6 +35,8 @@ import { ComposantSearchbarComponent } from './catalog/composant-searchbar/compo
 import { ComposantRecapComponent } from './client/composant-recap/composant-recap.component';
 import {MatBadgeModule} from '@angular/material/badge';
 import {MatIcon, MatIconModule} from '@angular/material/icon';
+import { ApiHttpInterceptor } from './core/ApiHttpInterceptor';
+
 
 @NgModule({
   declarations: [
@@ -77,7 +79,7 @@ import {MatIcon, MatIconModule} from '@angular/material/icon';
     AppRoutingModule,
     NgxsModule.forRoot([FruitState]),
   ],
-  providers: [],
+  providers: [{ provide: HTTP_INTERCEPTORS, useClass:ApiHttpInterceptor, multi: true }],
   schemas: [
     CUSTOM_ELEMENTS_SCHEMA
   ],

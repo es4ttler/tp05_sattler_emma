@@ -10,7 +10,7 @@ import { Client } from '../../core/models/Client';
 export class ComposantRecapComponent {
 
   constructor(public ts: ServiceTestService) {
-    ts.getCatalogue();
+    ts.getAll();
   }
 
   @Input() client:Client = new Client();

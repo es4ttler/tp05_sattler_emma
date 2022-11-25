@@ -5,7 +5,7 @@ use Slim\Factory\AppFactory;
 use Tuupola\Middleware\HttpBasicAuthentication;
 use \Firebase\JWT\JWT;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
-require __DIR__ . '/vendor/autoload.php';
+require __DIR__ . '/../vendor/autoload.php';
  
 const JWT_SECRET = "makey1234567";
 
@@ -15,7 +15,7 @@ $app->addErrorMiddleware(true, true, true);
 function  addHeaders (Response $response) : Response {
     $response = $response
     ->withHeader("Content-Type", "application/json")
-    ->withHeader('Access-Control-Allow-Origin', ('https://met02-eber.onrender.com'))
+    ->withHeader('Access-Control-Allow-Origin', ('https://sattler-emma.onrender.com'))
     ->withHeader('Access-Control-Allow-Headers', 'Content-Type,  Authorization')
     ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS')
     ->withHeader('Access-Control-Expose-Headers', 'Authorization');
@@ -23,26 +23,12 @@ function  addHeaders (Response $response) : Response {
     return $response;
 }
 
-$options = [
-    "attribute" => "token",
-    "header" => "Authorization",
-    "regexp" => "/Bearer\s+(.*)$/i",
-    "secure" => false,
-    "algorithm" => ["HS256"],
-    "secret" => JWT_SECRET,
-    "path" => ["/"],
-    "ignore" => ["/hello","/login","/createUser"],
-    "error" => function ($response, $arguments) {
-        $data = array('ERREUR' => 'Connexion', 'ERREUR' => 'JWT Non valide');
-        $response = $response->withStatus(401);
-        return $response->withHeader("Content-Type", "application/json")->getBody()->write(json_encode($data));
-    }
-];
+
 
 /*
 =================================================HELLO=================================================
 */
-$app->get('/hello/{name}', function (Request $request, Response $response, $args) {
+$app->get('/api/hello/{name}', function (Request $request, Response $response, $args) {
     $array = [];
     $array ["nom"] = $args ['name'];
     $response->getBody()->write(json_encode ($array));
@@ -56,16 +42,16 @@ $app->get('/hello/{name}', function (Request $request, Response $response, $args
 */
 
 // GET - GET ALL CLIENTS
-$app->get('/clients', function (Request $request, Response $response, $args) {
-    $json = file_get_contents("./mock/client.json");
+$app->get('/api/clients', function (Request $request, Response $response, $args) {
+    $json = file_get_contents("../mock/client.json");
     $response = addHeaders($response);
     $response->getBody()->write($json);
     return $response;
 });
 
 // GET - GET CLIENT BY ID
-$app->get('/client/{id}', function (Request $request, Response $response, $args) {
-    $json = file_get_contents("./mock/client.json");
+$app->get('/api/client/{id}', function (Request $request, Response $response, $args) {
+    $json = file_get_contents("../mock/client.json");
     $array = json_decode($json, true);
     $id = $args ['id'];
     $array = $array[$id];
@@ -75,7 +61,7 @@ $app->get('/client/{id}', function (Request $request, Response $response, $args)
 });
 
 // POST - CREATE CLIENT
-$app->post('/client', function (Request $request, Response $response, $args) {
+$app->post('/api/client', function (Request $request, Response $response, $args) {
     $inputJSON = file_get_contents('php://input');
     $body = json_decode( $inputJSON, TRUE ); //convert JSON into array
     $civility=$body['civility'] ?? "";
@@ -100,14 +86,14 @@ $app->post('/client', function (Request $request, Response $response, $args) {
     }
 
     if (!$err) {
-        // $json = file_get_contents("./mock/clients.json");
+        // $json = file_get_contents("../mock/clients.json");
         // $array = json_decode($json, true);
         // $id = count($array);
 
         //Create a new client in an array
         $array = array('id' => $id, 'name' => $name, 'firstName' => $firstName, 'email' => $email, 'tel' => $tel, 'address' => $address, 'city' => $city, 'cp' => $cp, 'country' => $country, 'login' => $login, 'password' => $password, 'civility' => $civility);
         $json = json_encode($array);
-        // file_put_contents("./mock/clients.json", $json);
+        // file_put_contents("../mock/clients.json", $json);
         $response = addHeaders($response);
         $response->getBody()->write($json);
     }
@@ -118,7 +104,7 @@ $app->post('/client', function (Request $request, Response $response, $args) {
 });
 
 //PUT - UPDATE CLIENT
-$app->put('/client/{id}', function (Request $request, Response $response, $args) {
+$app->put('/api/client/{id}', function (Request $request, Response $response, $args) {
     $inputJSON = file_get_contents('php://input');
     $body = json_decode( $inputJSON, TRUE ); //convert JSON into array 
     $civility=$body['civility'] ?? "";
@@ -143,12 +129,12 @@ $app->put('/client/{id}', function (Request $request, Response $response, $args)
     }
 
     if (!$err) {
-        $json = file_get_contents("./mock/client.json");
+        $json = file_get_contents("../mock/client.json");
         $array = json_decode($json, true);
         $id = $args ['id'];
         $array[$id] = array('id' => $id, 'name' => $name, 'firstName' => $firstName, 'email' => $email, 'tel' => $tel, 'address' => $address, 'city' => $city, 'cp' => $cp, 'country' => $country, 'login' => $login, 'password' => $password, 'civility' => $civility);
         $json = json_encode($array);
-        file_put_contents("./mock/client.json", $json);
+        file_put_contents("../mock/client.json", $json);
         $response = addHeaders($response);
         $response->getBody()->write($json);
     }
@@ -159,26 +145,28 @@ $app->put('/client/{id}', function (Request $request, Response $response, $args)
 });
 
 //DELETE - DELETE CLIENT
-$app->delete('/client/{id}', function (Request $request, Response $response, $args) {
-    $json = file_get_contents("./mock/client.json");
+$app->delete('/api/client/{id}', function (Request $request, Response $response, $args) {
+    $json = file_get_contents("../mock/client.json");
     $array = json_decode($json, true);
     $id = $args ['id'];
     unset($array[$id]);
     $json = json_encode($array);
-    file_put_contents("./mock/client.json", $json);
+    file_put_contents("../mock/client.json", $json);
     $response = addHeaders($response);
     $response->getBody()->write($json);
     return $response;
 });
 
 // POST - LOGIN
-$app->post('/login', function (Request $request, Response $response, $args) {   
+$app->post('/api/login', function (Request $request, Response $response, $args) {  
+    $err=false; 
     $inputJSON = file_get_contents('php://input');
+    $response = addHeaders($response);
     $body = json_decode( $inputJSON, TRUE ); //convert JSON into array 
     $login = $body['login'] ?? ""; 
     $password = $body['password'] ?? "";
 
-    if (!preg_match("/[a-zA-Z0-9]{1,20}/",$login)|| !preg_match("/[a-zA-Z0-9]{1,20}/",$pass))  {
+    if (!preg_match("/[a-zA-Z0-9]{1,20}/",$login)|| !preg_match("/[a-zA-Z0-9]{1,20}/",$password))  {
         $err=true;
     }
 
@@ -198,16 +186,17 @@ $app->post('/login', function (Request $request, Response $response, $args) {
 */
 
 //GET - GET ALL FRUITS
-$app->get('/fruits', function (Request $request, Response $response, $args) {
-    $json = file_get_contents("./mock/catalog.json");
+$app->get('/api/fruits', function (Request $request, Response $response, $args) {
+    $json = file_get_contents("../mock/catalog.json");
+    $array = json_decode($json, true);
     $response = addHeaders($response);
     $response->getBody()->write($json);
     return $response;
 });
 
 //GET - GET FRUIT BY ID
-$app->get('/fruit/{id}', function (Request $request, Response $response, $args) {
-    $json = file_get_contents("./mock/catalog.json");
+$app->get('/api/fruit/{id}', function (Request $request, Response $response, $args) {
+    $json = file_get_contents("../mock/catalog.json");
     $array = json_decode($json, true);
     $id = $args ['id'];
     $array = $array[$id];
@@ -217,7 +206,7 @@ $app->get('/fruit/{id}', function (Request $request, Response $response, $args) 
 });
 
 //POST - ADD FRUIT
-$app->post('/fruit', function (Request $request, Response $response, $args) {
+$app->post('/api/fruit', function (Request $request, Response $response, $args) {
     $inputJSON = file_get_contents('php://input');
     $body = json_decode( $inputJSON, TRUE ); //convert JSON into array 
     $name = $body ['name'] ?? ""; 
@@ -232,12 +221,12 @@ $app->post('/fruit', function (Request $request, Response $response, $args) {
     }
 
     if (!$err) {
-        $json = file_get_contents("./mock/catalog.json");
+        $json = file_get_contents("../mock/catalog.json");
         $array = json_decode($json, true);
         $id = count($array);
         $array[] = array('id' => $id, 'name' => $name, 'price' => $price, 'color' => $color);
         $json = json_encode($array);
-        file_put_contents("./mock/catalog.json", $json);
+        file_put_contents("../mock/catalog.json", $json);
         $response = addHeaders($response);
         $response->getBody()->write($json);
     }
@@ -248,7 +237,7 @@ $app->post('/fruit', function (Request $request, Response $response, $args) {
 });
 
 //UPDATE - UPDATE FRUIT
-$app->put('/fruit/{id}', function (Request $request, Response $response, $args) {
+$app->put('/api/fruit/{id}', function (Request $request, Response $response, $args) {
     $inputJSON = file_get_contents('php://input');
     $body = json_decode( $inputJSON, TRUE ); //convert JSON into array 
     $name = $body ['name'] ?? ""; 
@@ -263,12 +252,12 @@ $app->put('/fruit/{id}', function (Request $request, Response $response, $args) 
     }
 
     if (!$err) {
-        $json = file_get_contents("./mock/catalog.json");
+        $json = file_get_contents("../mock/catalog.json");
         $array = json_decode($json, true);
         $id = $args ['id'];
         $array[$id] = array('id' => $id, 'name' => $name, 'price' => $price, 'color' => $color);
         $json = json_encode($array);
-        file_put_contents("./mock/catalog.json", $json);
+        file_put_contents("../mock/catalog.json", $json);
         $response = addHeaders($response);
         $response->getBody()->write($json);
     }
@@ -279,13 +268,13 @@ $app->put('/fruit/{id}', function (Request $request, Response $response, $args) 
 });
 
 //DELETE - DELETE FRUIT
-$app->delete('/fruit/{id}', function (Request $request, Response $response, $args) {
-    $json = file_get_contents("./mock/catalog.json");
+$app->delete('/api/fruit/{id}', function (Request $request, Response $response, $args) {
+    $json = file_get_contents("../mock/catalog.json");
     $array = json_decode($json, true);
     $id = $args ['id'];
     unset($array[$id]);
     $json = json_encode($array);
-    file_put_contents("./mock/catalog.json", $json);
+    file_put_contents("../mock/catalog.json", $json);
     $response->getBody()->write($json);
     $response = addHeaders($response);
     return $response;
@@ -294,7 +283,21 @@ $app->delete('/fruit/{id}', function (Request $request, Response $response, $arg
 /*
 =================================================JWT=================================================
 */
-
+$options = [
+    "attribute" => "token",
+    "header" => "Authorization",
+    "regexp" => "/Bearer\s+(.*)$/i",
+    "secure" => false,
+    "algorithm" => ["HS256"],
+    "secret" => JWT_SECRET,
+    "path" => ["/api"],
+    "ignore" => ["/api/hello","/api/login","/api/createUser"],
+    "error" => function ($response, $arguments) {
+        $data = array('ERREUR' => 'Connexion', 'ERREUR' => 'JWT Non valide');
+        $response = $response->withStatus(401);
+        return $response->withHeader("Content-Type", "application/json")->getBody()->write(json_encode($data));
+    }
+]; 
 function createJwT (Response $response) : Response {
 
     $issuedAt = time();

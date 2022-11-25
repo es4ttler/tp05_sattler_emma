@@ -21,7 +21,7 @@ export class ComposantCatalogComponent implements OnInit {
   ngOnInit(): void {}
 
   getCatalog(): Subscription {
-    return this.catalogService.getCatalog().subscribe((items) => {
+    return this.catalogService.getAll().subscribe((items) => {
       this.catalog = items;
     });
   }

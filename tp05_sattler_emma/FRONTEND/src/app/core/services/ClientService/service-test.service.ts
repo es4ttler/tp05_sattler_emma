@@ -1,25 +1,36 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { Client } from '../../models/Client';
+import { ApiService } from '../ApiService/api.service';
 
 @Injectable({
   providedIn: 'root'
 })
-export class ServiceTestService {
+export class ServiceTestService extends ApiService{
 
-  constructor() { }
-
-  postClient(): string {
-    return "postClient"
+  constructor(private http: HttpClient) { 
+    super()
   }
 
-  getClient(): string {
-    return "getClient";
+  getAll(): Observable<Client[]> {
+    return this.http.get<Client[]>(this.apiUrl+"clients");
   }
 
-  postLogin(): string {
-    return "postLogin";
+  getById(id: number): Observable<Client> {
+    return this.http.get<Client>(this.apiUrl+"client"+"/"+id);
   }
 
-  getCatalogue(): string {
-    return "getCatalogue";
+  addClient(client: Client): Observable<Client> {
+    return this.http.post<Client>(this.apiUrl+"client", client);
   }
+
+  updateClient(client: Client): Observable<Client> {
+    return this.http.put<Client>(this.apiUrl+"client", client);
+  }
+
+  deleteClient(id: number): Observable<Client> {
+    return this.http.delete<Client>(this.apiUrl+"client"+"/"+id);
+  }
+  
 }

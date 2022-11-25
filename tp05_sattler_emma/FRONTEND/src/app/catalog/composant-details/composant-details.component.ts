@@ -16,7 +16,7 @@ export class ComposantDetailsComponent implements OnInit {
   constructor(private catalogService: CatalogService, private route: ActivatedRoute, private store: Store) { }
 
   ngOnInit(): void {
-    this.catalogService.getCatalog().subscribe(
+    this.catalogService.getAll().subscribe(
       data => {
         this.fruit = data.find(p => p.id == this.route.snapshot.params['id']);
       }
